@@ -1337,9 +1337,16 @@ describe('permissions controller', function () {
     })
 
     it('notifyAccountsChanged records history and sends notification', async function () {
+      sinon.spy(permController, '_isUnlocked')
+
       permController.notifyAccountsChanged(
         DOMAINS.a.origin,
         ACCOUNTS.a.permitted,
+      )
+
+      assert.ok(
+        permController._isUnlocked.calledOnce,
+        '_isUnlocked should have been called once',
       )
 
       assert.ok(
@@ -1351,6 +1358,25 @@ describe('permissions controller', function () {
         notifications[DOMAINS.a.origin],
         [NOTIFICATIONS.newAccounts(ACCOUNTS.a.permitted)],
         'origin should have correct notification',
+      )
+    })
+
+    it('notifyAccountsChanged does nothing if _isUnlocked returns false', async function () {
+      permController._isUnlocked = sinon.fake.returns(false)
+
+      permController.notifyAccountsChanged(
+        DOMAINS.a.origin,
+        ACCOUNTS.a.permitted,
+      )
+
+      assert.ok(
+        permController._isUnlocked.calledOnce,
+        '_isUnlocked should have been called once',
+      )
+
+      assert.ok(
+        permController.permissionsLog.updateAccountsHistory.notCalled,
+        'permissionsLog.updateAccountsHistory should not have been called',
       )
     })
 
