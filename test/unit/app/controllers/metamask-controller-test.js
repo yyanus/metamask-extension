@@ -9,7 +9,8 @@ import proxyquire from 'proxyquire'
 import firstTimeState from '../../localhostState'
 import createTxMeta from '../../../lib/createTxMeta'
 
-const Ganache = require('../../../../test/e2e/ganache')
+const Ganache = require('../../../e2e/ganache')
+
 const ganacheServer = new Ganache()
 
 const threeBoxSpies = {

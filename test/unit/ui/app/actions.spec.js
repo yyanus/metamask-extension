@@ -12,7 +12,8 @@ import * as actions from '../../../../ui/app/store/actions'
 import MetaMaskController from '../../../../app/scripts/metamask-controller'
 import firstTimeState from '../../localhostState'
 
-const Ganache = require('../../../../test/e2e/ganache')
+const Ganache = require('../../../e2e/ganache')
+
 const ganacheServer = new Ganache()
 
 const { provider } = createTestProviderTools({ scaffold: {} })

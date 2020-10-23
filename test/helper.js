@@ -30,7 +30,6 @@ process.on('exit', () => {
 
 Enzyme.configure({ adapter: new Adapter() })
 
-
 log.setDefaultLevel(5)
 global.log = log
 
