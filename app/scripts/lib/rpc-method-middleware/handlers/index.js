@@ -1,4 +1,5 @@
+import addEthereumChain from './add-ethereum-chain'
 import logWeb3Usage from './log-web3-usage'
 
-const handlers = [logWeb3Usage]
+const handlers = [addEthereumChain, logWeb3Usage]
 export default handlers

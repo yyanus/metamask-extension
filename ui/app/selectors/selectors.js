@@ -7,7 +7,6 @@ import {
   checksumAddress,
   getAccountByAddress,
 } from '../helpers/utils/util'
-import { getPermissionsRequestCount } from './permissions'
 
 export function getNetworkIdentifier(state) {
   const {
@@ -255,6 +254,7 @@ export function getTotalUnapprovedCount(state) {
     unapprovedDecryptMsgCount = 0,
     unapprovedEncryptionPublicKeyMsgCount = 0,
     unapprovedTypedMessagesCount = 0,
+    pendingApprovalCount = 0,
   } = state.metamask
 
   return (
@@ -264,7 +264,7 @@ export function getTotalUnapprovedCount(state) {
     unapprovedEncryptionPublicKeyMsgCount +
     unapprovedTypedMessagesCount +
     getUnapprovedTxCount(state) +
-    getPermissionsRequestCount(state) +
+    pendingApprovalCount +
     getSuggestedTokenCount(state)
   )
 }

@@ -21,6 +21,7 @@ import nanoid from 'nanoid'
 import contractMap from 'eth-contract-metadata'
 import {
   AddressBookController,
+  ApprovalController,
   CurrencyRateController,
   PhishingController,
 } from '@metamask/controllers'
@@ -104,6 +105,10 @@ export default class MetamaskController extends EventEmitter {
     // next, we will initialize the controllers
     // controller initialization order matters
 
+    this.approvalController = new ApprovalController({
+      showApprovalRequest: opts.showUserConfirmation,
+    })
+
     this.networkController = new NetworkController(initState.NetworkController)
     this.networkController.setInfuraProjectId(opts.infuraProjectId)
 
@@ -150,7 +155,7 @@ export default class MetamaskController extends EventEmitter {
       isUnlocked: this.isUnlocked.bind(this),
       initState: initState.AppStateController,
       onInactiveTimeout: () => this.setLocked(),
-      showUnlockRequest: opts.showUnlockRequest,
+      showUnlockRequest: opts.showUserConfirmation,
       preferencesStore: this.preferencesController.store,
     })
 
@@ -237,6 +242,7 @@ export default class MetamaskController extends EventEmitter {
 
     this.permissionsController = new PermissionsController(
       {
+        approvals: this.approvalController,
         getKeyringAccounts: this.keyringController.getAccounts.bind(
           this.keyringController,
         ),
@@ -247,7 +253,6 @@ export default class MetamaskController extends EventEmitter {
         notifyDomain: this.notifyConnections.bind(this),
         notifyAllDomains: this.notifyAllConnections.bind(this),
         preferences: this.preferencesController.store,
-        showPermissionRequest: opts.showPermissionRequest,
       },
       initState.PermissionsController,
       initState.PermissionsMetadata,
@@ -302,7 +307,7 @@ export default class MetamaskController extends EventEmitter {
       getParticipateInMetrics: () =>
         this.preferencesController.getParticipateInMetaMetrics(),
     })
-    this.txController.on('newUnapprovedTx', () => opts.showUnapprovedTx())
+    this.txController.on('newUnapprovedTx', () => opts.showUserConfirmation())
 
     this.txController.on(`tx:status-update`, async (txId, status) => {
       if (
@@ -397,8 +402,8 @@ export default class MetamaskController extends EventEmitter {
       PermissionsMetadata: this.permissionsController.store,
       ThreeBoxController: this.threeBoxController.store,
       SwapsController: this.swapsController.store,
-      // ENS Controller
       EnsController: this.ensController.store,
+      ApprovalController: this.approvalController,
     })
     this.memStore.subscribe(this.sendUpdate.bind(this))
 
@@ -519,6 +524,7 @@ export default class MetamaskController extends EventEmitter {
    */
   getApi() {
     const {
+      approvalController,
       keyringController,
       networkController,
       onboardingController,
@@ -825,6 +831,11 @@ export default class MetamaskController extends EventEmitter {
         swapsController.setSwapsLiveness,
         swapsController,
       ),
+      // approval controller
+      resolvePendingApproval: approvalController.resolve.bind(
+        approvalController,
+      ),
+      rejectPendingApproval: approvalController.reject.bind(approvalController),
     }
   }
 
@@ -1376,7 +1387,7 @@ export default class MetamaskController extends EventEmitter {
       req,
     )
     this.sendUpdate()
-    this.opts.showUnconfirmedMessage()
+    this.opts.showUserConfirmation()
     return promise
   }
 
@@ -1439,7 +1450,7 @@ export default class MetamaskController extends EventEmitter {
       req,
     )
     this.sendUpdate()
-    this.opts.showUnconfirmedMessage()
+    this.opts.showUserConfirmation()
     return promise
   }
 
@@ -1498,7 +1509,7 @@ export default class MetamaskController extends EventEmitter {
       req,
     )
     this.sendUpdate()
-    this.opts.showUnconfirmedMessage()
+    this.opts.showUserConfirmation()
     return promise
   }
 
@@ -1590,7 +1601,7 @@ export default class MetamaskController extends EventEmitter {
       req,
     )
     this.sendUpdate()
-    this.opts.showUnconfirmedMessage()
+    this.opts.showUserConfirmation()
     return promise
   }
 
@@ -1655,7 +1666,7 @@ export default class MetamaskController extends EventEmitter {
       version,
     )
     this.sendUpdate()
-    this.opts.showUnconfirmedMessage()
+    this.opts.showUserConfirmation()
     return promise
   }
 
@@ -1968,6 +1979,21 @@ export default class MetamaskController extends EventEmitter {
       createMethodMiddleware({
         origin,
         sendMetrics: this.trackMetaMetricsEvent,
+        customRpcExistsWith: this.customRpcExistsWith.bind(this),
+        requestUserApproval: this.approvalController.addAndShowApprovalRequest.bind(
+          this.approvalController,
+        ),
+        addCustomRpc: ({
+          chainId,
+          blockExplorerUrl,
+          ticker,
+          networkName,
+          rpcUrl,
+        } = {}) => {
+          this.updateAndSetCustomRpc(rpcUrl, chainId, ticker, networkName, {
+            blockExplorerUrl,
+          })
+        },
       }),
     )
     // filter and subscription polyfills
@@ -2263,8 +2289,10 @@ export default class MetamaskController extends EventEmitter {
    * @param {string} rpcUrl - A URL for a valid Ethereum RPC API.
    * @param {string} chainId - The chainId of the selected network.
    * @param {string} ticker - The ticker symbol of the selected network.
-   * @param {string} nickname - Optional nickname of the selected network.
-   * @returns {Promise<String>} The RPC Target URL confirmed.
+   * @param {string} [nickname] - Nickname of the selected network.
+   * @param {Object} [rpcPrefs] - RPC preferences.
+   * @param {string} [rpcPrefs.blockExplorerUrl] - URL of block explorer for the chain.
+   * @returns {Promise<String>} - The RPC Target URL confirmed.
    */
   async updateAndSetCustomRpc(
     rpcUrl,
@@ -2343,6 +2371,26 @@ export default class MetamaskController extends EventEmitter {
    */
   async delCustomRpc(rpcUrl) {
     await this.preferencesController.removeFromFrequentRpcList(rpcUrl)
+  }
+
+  /**
+   * Checks whether the given RPC info object matches at least one field of any
+   * existing frequent RPC list object.
+   *
+   * @param {Object} rpcInfo - The RPC endpoint properties and values to check.
+   * @returns {boolean} true if there exists an RPC list entry with any of the
+   * given propertiers, false otherwise.
+   */
+  customRpcExistsWith(rpcInfo) {
+    const frequentRpcListDetail = this.preferencesController.getFrequentRpcListDetail()
+    for (const existingRpcInfo of frequentRpcListDetail) {
+      for (const key of Object.keys(rpcInfo)) {
+        if (existingRpcInfo[key] === rpcInfo[key]) {
+          return true
+        }
+      }
+    }
+    return false
   }
 
   async initializeThreeBox() {
