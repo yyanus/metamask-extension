@@ -33,14 +33,14 @@ export default getProviderState
  * @param {GetProviderStateOptions} options
  */
 async function getProviderStateHandler(
-  _req,
+  req,
   res,
   _next,
   end,
   { getProviderState: _getProviderState },
 ) {
   res.result = {
-    ..._getProviderState(),
+    ...(await _getProviderState(req.origin)),
   }
   return end()
 }
