@@ -6,13 +6,9 @@ import sinon from 'sinon'
 import {
   METADATA_STORE_KEY,
   METADATA_CACHE_MAX_SIZE,
-  WALLET_PREFIX,
 } from '../../../../../app/scripts/controllers/permissions/enums'
 
-import {
-  PermissionsController,
-  addInternalMethodPrefix,
-} from '../../../../../app/scripts/controllers/permissions'
+import { PermissionsController } from '../../../../../app/scripts/controllers/permissions'
 
 import { getRequestUserApprovalHelper, grantPermissions } from './helpers'
 
@@ -187,7 +183,7 @@ describe('permissions controller', function () {
         assert.deepEqual(
           notifications[origin],
           [NOTIFICATIONS.removedAccounts()],
-          'origin should have single wallet_accountsChanged:[] notification',
+          'origin should have single metamask_accountsChanged:[] notification',
         )
       })
 
@@ -1641,12 +1637,6 @@ describe('permissions controller', function () {
         permController.pendingApprovalOrigins.has(origin),
         'pending approval origins should have expected item',
       )
-    })
-
-    it('addInternalMethodPrefix', function () {
-      const str = 'foo'
-      const res = addInternalMethodPrefix(str)
-      assert.equal(res, WALLET_PREFIX + str, 'should prefix correctly')
     })
   })
 })

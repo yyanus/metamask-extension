@@ -583,17 +583,17 @@ export const getters = deepFreeze({
     },
 
     /**
-     * Gets a wallet_sendDomainMetadata RPC request object.
+     * Gets a metamask_sendDomainMetadata RPC request object.
      *
      * @param {string} origin - The origin of the request
      * @param {Object} name - The domainMetadata name
      * @param {Array<any>} [args] - Any other data for the request's domainMetadata
      * @returns {Object} An RPC request object
      */
-    wallet_sendDomainMetadata: (origin, name, ...args) => {
+    metamask_sendDomainMetadata: (origin, name, ...args) => {
       return {
         origin,
-        method: 'wallet_sendDomainMetadata',
+        method: 'metamask_sendDomainMetadata',
         domainMetadata: {
           ...args,
           name,
