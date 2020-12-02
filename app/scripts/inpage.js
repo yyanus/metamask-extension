@@ -33,7 +33,7 @@ cleanContextForImports()
 /* eslint-disable import/first */
 import log from 'loglevel'
 import LocalMessageDuplexStream from 'post-message-stream'
-import { initProvider } from '@metamask/inpage-provider'
+import { initializeProvider } from '@metamask/inpage-provider'
 
 // TODO:deprecate:2020
 import setupWeb3 from './lib/setupWeb3'
@@ -53,7 +53,7 @@ const metamaskStream = new LocalMessageDuplexStream({
   target: 'contentscript',
 })
 
-initProvider({
+initializeProvider({
   connectionStream: metamaskStream,
 })
 

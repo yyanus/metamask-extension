@@ -7,7 +7,7 @@ import { MESSAGE_TYPE } from '../../enums'
  */
 
 const getProviderState = {
-  methodName: MESSAGE_TYPE.GET_PROVIDER_STATE,
+  methodNames: [MESSAGE_TYPE.GET_PROVIDER_STATE],
   implementation: getProviderStateHandler,
 }
 export default getProviderState
