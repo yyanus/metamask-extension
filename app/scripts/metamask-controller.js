@@ -832,11 +832,6 @@ export default class MetamaskController extends EventEmitter {
         swapsController.setSwapsLiveness,
         swapsController,
       ),
-      // approval controller
-      resolvePendingApproval: approvalController.resolve.bind(
-        approvalController,
-      ),
-      rejectPendingApproval: approvalController.reject.bind(approvalController),
     }
   }
 
