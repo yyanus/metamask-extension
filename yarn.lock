@@ -2018,6 +2018,8 @@
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@metamask/controllers/-/controllers-5.0.0.tgz#f490a504126c2e19bf019dc94d61dff898f62975"
   integrity sha512-rpHV+i5p8BNTiCV806Ne9M67CquwbrSLqxwox/rAIdJZeD3YJ/RqXoKcyda4YwdfxAqZ3QyZh6Ww8qyGb1MrFQ==
+  dependencies:
+    isomorphic-fetch "^3.0.0"
 
 "@metamask/contract-metadata@^1.19.0":
   version "1.19.0"
