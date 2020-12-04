@@ -525,7 +525,6 @@ export default class MetamaskController extends EventEmitter {
    */
   getApi() {
     const {
-      approvalController,
       keyringController,
       networkController,
       onboardingController,
