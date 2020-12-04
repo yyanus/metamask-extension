@@ -27,11 +27,6 @@ import {
 // instanbul ignore next
 const noop = () => undefined
 
-/**
- * @class
- * @constructor
- * @public
- */
 export class PermissionsController {
   constructor(
     {
