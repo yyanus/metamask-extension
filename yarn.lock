@@ -2019,7 +2019,28 @@
   resolved "https://registry.yarnpkg.com/@metamask/controllers/-/controllers-5.0.0.tgz#f490a504126c2e19bf019dc94d61dff898f62975"
   integrity sha512-rpHV+i5p8BNTiCV806Ne9M67CquwbrSLqxwox/rAIdJZeD3YJ/RqXoKcyda4YwdfxAqZ3QyZh6Ww8qyGb1MrFQ==
   dependencies:
+    await-semaphore "^0.1.3"
+    eth-contract-metadata "^1.11.0"
+    eth-ens-namehash "^2.0.8"
+    eth-json-rpc-infura "^5.1.0"
+    eth-keyring-controller "^5.6.1"
+    eth-method-registry "1.1.0"
+    eth-phishing-detect "^1.1.13"
+    eth-query "^2.1.2"
+    eth-rpc-errors "^3.0.0"
+    eth-sig-util "^2.3.0"
+    ethereumjs-util "^6.1.0"
+    ethereumjs-wallet "0.6.0"
+    ethjs-query "^0.3.8"
+    human-standard-collectible-abi "^1.0.2"
+    human-standard-token-abi "^2.0.0"
     isomorphic-fetch "^3.0.0"
+    jsonschema "^1.2.4"
+    percentile "^1.2.1"
+    single-call-balance-checker-abi "^1.0.0"
+    uuid "^3.3.2"
+    web3 "^0.20.7"
+    web3-provider-engine "^16.0.1"
 
 "@metamask/contract-metadata@^1.19.0":
   version "1.19.0"
